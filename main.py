@@ -52,7 +52,10 @@ krw_rub_rate = 0
 rub_to_krw_rate = 0
 usd_rate = 0
 users = set()
-admins = [7311593407, 728438182]
+
+admins = []
+CHANNEL_USERNAME = "@bazarish_auto"  # Юзернейм канала
+
 car_month = None
 car_year = None
 
@@ -65,6 +68,15 @@ def print_message(message):
     print(f"{message}")
     print("##############\n\n")
     return None
+
+
+def is_subscribed(user_id):
+    try:
+        chat_member = bot.get_chat_member(CHANNEL_USERNAME, user_id)
+        return chat_member.status in ["member", "administrator", "creator"]
+    except Exception as e:
+        print(f"Ошибка при проверке подписки: {e}")
+        return False  # Если ошибка, считаем, что не подписан
 
 
 # Функция для установки команд меню
@@ -143,6 +155,28 @@ def get_currency_rates():
 # Обработчик команды /cbr
 @bot.message_handler(commands=["cbr"])
 def cbr_command(message):
+    user_id = message.from_user.id
+
+    if not is_subscribed(user_id):
+        keyboard = types.InlineKeyboardMarkup()
+        keyboard.add(
+            types.InlineKeyboardButton(
+                "🔗 Подписаться", url=f"https://t.me/{CHANNEL_USERNAME.lstrip('@')}"
+            )
+        )
+        keyboard.add(
+            types.InlineKeyboardButton(
+                "🔄 Проверить подписку", callback_data="check_subscription"
+            )
+        )
+
+        bot.send_message(
+            message.chat.id,
+            f"🚫 Доступ ограничен! Подпишитесь на наш канал {CHANNEL_USERNAME}, чтобы пользоваться ботом.",
+            reply_markup=keyboard,
+        )
+        return  # Прерываем выполнение, если не подписан
+
     try:
         rates_text = get_currency_rates()
 
@@ -165,12 +199,6 @@ def cbr_command(message):
         print(f"Ошибка при получении курсов валют: {e}")
 
 
-# Обработчик команды /currencyrates
-@bot.message_handler(commands=["currencyrates"])
-def currencyrates_command(message):
-    bot.send_message(message.chat.id, "Актуальные курсы валют: ...")
-
-
 # Main menu creation function
 def main_menu():
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
@@ -187,18 +215,69 @@ def main_menu():
     return keyboard
 
 
+@bot.callback_query_handler(func=lambda call: call.data == "check_subscription")
+def check_subscription(call):
+    user_id = call.from_user.id
+
+    if is_subscribed(user_id):
+        bot.answer_callback_query(call.id, "✅ Вы подписаны!")
+        bot.send_message(
+            call.message.chat.id,
+            "✅ Спасибо за подписку! Теперь вы можете пользоваться ботом.",
+            reply_markup=main_menu(),
+        )
+    else:
+        keyboard = types.InlineKeyboardMarkup()
+        keyboard.add(
+            types.InlineKeyboardButton(
+                "🔗 Подписаться", url=f"https://t.me/{CHANNEL_USERNAME.lstrip('@')}"
+            )
+        )
+        keyboard.add(
+            types.InlineKeyboardButton(
+                "🔄 Проверить подписку", callback_data="check_subscription"
+            )
+        )
+
+        bot.send_message(
+            call.message.chat.id,
+            "🚫 Вы ещё не подписались! Подпишитесь и нажмите кнопку 🔄 Проверить подписку.",
+            reply_markup=keyboard,
+        )
+
+
 # Start command handler
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
+    user_id = message.from_user.id
+
+    if not is_subscribed(user_id):
+        keyboard = types.InlineKeyboardMarkup()
+        keyboard.add(
+            types.InlineKeyboardButton(
+                "🔗 Подписаться", url=f"https://t.me/{CHANNEL_USERNAME.lstrip('@')}"
+            )
+        )
+        keyboard.add(
+            types.InlineKeyboardButton(
+                "🔄 Проверить подписку", callback_data="check_subscription"
+            )
+        )
+
+        bot.send_message(
+            message.chat.id,
+            f"🚫 Доступ ограничен! Подпишитесь на наш канал {CHANNEL_USERNAME}, чтобы пользоваться ботом.",
+            reply_markup=keyboard,
+        )
+        return  # Прерываем выполнение, если не подписан
+
     get_currency_rates()
 
-    user = message.from_user
-    user_first_name = user.first_name
-
+    user_first_name = message.from_user.first_name
     welcome_message = (
         f"Здравствуйте, {user_first_name}!\n\n"
-        "Я бот компании Bazarish Auto. Я помогу вам расчитать стоимость понравившегося вам автомобиля из Южной Кореи до Владивостока\n\n"
-        "Выберите действие из меню ниже"
+        "Я бот компании Bazarish Auto. Я помогу вам рассчитать стоимость понравившегося вам автомобиля из Южной Кореи до Владивостока.\n\n"
+        "Выберите действие из меню ниже."
     )
     bot.send_message(message.chat.id, welcome_message, reply_markup=main_menu())
 
@@ -404,7 +483,7 @@ def calculate_cost(link, message):
             + customs_duty
             + customs_fee
             + recycling_fee
-            + (346 * usd_rate)
+            + (1100 * usd_rate)
             + 50000
             + 30000
             + 8000
@@ -484,9 +563,9 @@ def calculate_cost(link, message):
         car_data["util_fee_krw"] = recycling_fee / krw_rub_rate
         car_data["util_fee_rub"] = recycling_fee
 
-        car_data["broker_russia_usd"] = 346
-        car_data["broker_russia_krw"] = 346 * usd_rate / krw_rub_rate
-        car_data["broker_russia_rub"] = 346 * usd_rate
+        car_data["broker_russia_usd"] = 1100
+        car_data["broker_russia_krw"] = 1100 * usd_rate / krw_rub_rate
+        car_data["broker_russia_rub"] = 1100 * usd_rate
 
         car_data["svh_russia_usd"] = 50000 / usd_rate
         car_data["svh_russia_krw"] = 50000 / krw_rub_rate
@@ -789,8 +868,6 @@ def handle_message(message):
     elif user_message == "Написать в WhatsApp":
         contacts = [
             {"name": "Константин", "phone": "+82 10-7650-3034"},
-            {"name": "Константин 2", "phone": "+82 10-7291-1701"},
-            {"name": "Елена ((English, 한국어))", "phone": "+82 10-3504-1522"},
             {"name": "Владимир", "phone": "+82 10-7930-2218"},
             {"name": "Илья", "phone": "+82 10-3458-2205"},
         ]
@@ -801,11 +878,8 @@ def handle_message(message):
                 for contact in contacts
             ]
         )
+        bot.send_message(message.chat.id, message_text, parse_mode="Markdown")
 
-        bot.send_message(
-            message.chat.id,
-            message_text,
-        )
     elif user_message == "О нас":
         about_message = "Bazarish Auto\nЮжнокорейская экспортная компания.\nСпециализируемся на поставках автомобилей из Южной Кореи в страны СНГ.\nОпыт работы более 5 лет.\n\nПочему выбирают нас?\n• Надежность и скорость доставки.\n• Индивидуальный подход к каждому клиенту.\n• Полное сопровождение сделки.\n\n💬 Ваш путь к надежным автомобилям начинается здесь!"
         bot.send_message(message.chat.id, about_message)
