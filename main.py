@@ -422,7 +422,7 @@ def calculate_cost(link, message):
         keyboard = types.InlineKeyboardMarkup()
         keyboard.add(
             types.InlineKeyboardButton(
-                "Написать менеджеру", url="https://t.me/KPP_Motorss"
+                "Написать менеджеру", url="https://t.me@BAZARISH_KPP"
             )
         )
         keyboard.add(
@@ -483,7 +483,7 @@ def calculate_cost(link, message):
             + customs_duty
             + customs_fee
             + recycling_fee
-            + (1100 * usd_rate)
+            + (346 * usd_rate)
             + 50000
             + 30000
             + 8000
@@ -563,9 +563,9 @@ def calculate_cost(link, message):
         car_data["util_fee_krw"] = recycling_fee / krw_rub_rate
         car_data["util_fee_rub"] = recycling_fee
 
-        car_data["broker_russia_usd"] = 1100
-        car_data["broker_russia_krw"] = 1100 * usd_rate / krw_rub_rate
-        car_data["broker_russia_rub"] = 1100 * usd_rate
+        car_data["broker_russia_usd"] = 346
+        car_data["broker_russia_krw"] = 346 * usd_rate / krw_rub_rate
+        car_data["broker_russia_rub"] = 346 * usd_rate
 
         car_data["svh_russia_usd"] = 50000 / usd_rate
         car_data["svh_russia_krw"] = 50000 / krw_rub_rate
@@ -591,7 +591,7 @@ def calculate_cost(link, message):
             f"Стоимость автомобиля в Корее: ₩{format_number(price_krw)}\n"
             f"Стоимость автомобиля под ключ до Владивостока: \n<b>${format_number(total_cost_usd)} </b> | <b>₩{format_number(total_cost_krw)} </b> | <b>{format_number(total_cost)} ₽</b>\n\n"
             f"🔗 <a href='{preview_link}'>Ссылка на автомобиль</a>\n\n"
-            "Если данное авто попадает под санкции, пожалуйста уточните возможность отправки в вашу страну у менеджера @KPP_Motorss\n\n"
+            "Если данное авто попадает под санкции, пожалуйста уточните возможность отправки в вашу страну у менеджера @BAZARISH_KPP\n\n"
             "🔗 <a href='https://t.me/bazarish_auto'>Официальный телеграм канал</a>\n"
         )
 
@@ -608,7 +608,7 @@ def calculate_cost(link, message):
         )
         keyboard.add(
             types.InlineKeyboardButton(
-                "Написать менеджеру", url="https://t.me/KPP_Motorss"
+                "Написать менеджеру", url="https://t.me/BAZARISH_KPP"
             )
         )
         keyboard.add(
@@ -724,7 +724,7 @@ def handle_callback_query(call):
             f"СВХ-Владивосток:\n<b>${format_number(car_data['svh_russia_usd'])}</b> | <b>₩{format_number(car_data['svh_russia_krw'])}</b> | <b>{format_number(car_data['svh_russia_rub'])} ₽</b>\n\n"
             f"Лаборатория, СБКТС, ЭПТС:\n<b>${format_number(car_data['lab_russia_usd'])}</b> | <b>₩{format_number(car_data['lab_russia_krw'])}</b> | <b>{format_number(car_data['lab_russia_rub'])} ₽</b>\n\n"
             f"Временная регистрация-Владивосток:\n<b>${format_number(car_data['perm_registration_russia_usd'])}</b> | <b>₩{format_number(car_data['perm_registration_russia_krw'])}</b> | <b>{format_number(car_data['perm_registration_russia_rub'])} ₽</b>\n\n"
-            f"<b>Доставку до вашего города уточняйте у менеджера @KPP_Motorss</b>\n"
+            f"<b>Доставку до вашего города уточняйте у менеджера @BAZARISH_KPP</b>\n"
         )
 
         # Inline buttons for further actions
@@ -747,7 +747,7 @@ def handle_callback_query(call):
 
         keyboard.add(
             types.InlineKeyboardButton(
-                "Связаться с менеджером", url="https://t.me/KPP_Motorss"
+                "Связаться с менеджером", url="https://t.me/BAZARISH_KPP"
             )
         )
 
@@ -791,7 +791,7 @@ def handle_callback_query(call):
             )
             keyboard.add(
                 types.InlineKeyboardButton(
-                    "Связаться с менеджером", url="https://t.me/KPP_Motorss"
+                    "Связаться с менеджером", url="https://t.me/BAZARISH_KPP"
                 )
             )
 
@@ -827,7 +827,7 @@ def handle_callback_query(call):
             )
             keyboard.add(
                 types.InlineKeyboardButton(
-                    "Связаться с менеджером", url="https://t.me/KPP_Motorss"
+                    "Связаться с менеджером", url="https://t.me/BAZARISH_KPP"
                 )
             )
 
@@ -863,7 +863,7 @@ def handle_message(message):
     # Проверка на другие команды
     elif user_message == "Написать менеджеру":
         bot.send_message(
-            message.chat.id, "Вы можете связаться с менеджером по ссылке: @KPP_Motorss"
+            message.chat.id, "Вы можете связаться с менеджером по ссылке: @BAZARISH_KPP"
         )
     elif user_message == "Написать в WhatsApp":
         contacts = [
