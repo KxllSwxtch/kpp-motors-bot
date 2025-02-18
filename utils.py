@@ -2,6 +2,9 @@ import requests
 import datetime
 import locale
 
+PROXY_URL = "http://B01vby:GBno0x@45.118.250.2:8000"
+proxies = {"http": PROXY_URL, "https": PROXY_URL}
+
 
 def format_number(number):
     return locale.format_string("%d", number, grouping=True)
