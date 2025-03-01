@@ -932,8 +932,8 @@ def handle_message(message):
     elif user_message == "Написать в WhatsApp":
         contacts = [
             {"name": "Константин", "phone": "+82 10-7650-3034"},
-            {"name": "Владимир", "phone": "+82 10-7930-2218"},
-            {"name": "Илья", "phone": "+82 10-3458-2205"},
+            # {"name": "Владимир", "phone": "+82 10-7930-2218"},
+            # {"name": "Илья", "phone": "+82 10-3458-2205"},
         ]
 
         message_text = "\n".join(
