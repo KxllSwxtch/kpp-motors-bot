@@ -385,6 +385,9 @@ def calculate_cost(link, message):
 
     print_message("ЗАПРОС НА РАСЧЁТ АВТОМОБИЛЯ")
 
+    get_rub_to_krw_rate()
+    get_currency_rates()
+
     # Отправляем сообщение и сохраняем его ID
     processing_message = bot.send_message(
         message.chat.id, "Обрабатываю данные. Пожалуйста подождите ⏳"
@@ -981,6 +984,6 @@ def handle_message(message):
 if __name__ == "__main__":
     # initialize_db()
     set_bot_commands()
-    get_rub_to_krw_rate()
-    get_currency_rates()
+    # get_rub_to_krw_rate()
+    # get_currency_rates()
     bot.polling(non_stop=True)
