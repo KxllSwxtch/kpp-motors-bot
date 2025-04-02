@@ -110,14 +110,6 @@ def get_rub_to_krw_rate():
         return None
 
 
-# Пример вызова
-rate = get_rub_to_krw_rate()
-if rate:
-    print(f"Текущий курс RUB → KRW: {rate:.2f} ₩")
-else:
-    print("Не удалось получить курс.")
-
-
 # Функция для получения курсов валют с API
 def get_currency_rates():
     global usd_rate, krw_rub_rate
@@ -385,6 +377,7 @@ def calculate_cost(link, message):
 
     print_message("ЗАПРОС НА РАСЧЁТ АВТОМОБИЛЯ")
 
+    # Получаем актуальный курс валют
     get_rub_to_krw_rate()
     get_currency_rates()
 
