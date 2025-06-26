@@ -57,7 +57,6 @@ usd_rate = 0
 users = set()
 
 admins = []
-CHANNEL_USERNAME = "@bazarish_auto"  # Юзернейм канала
 
 car_month = None
 car_year = None
@@ -71,15 +70,6 @@ def print_message(message):
     print(f"{message}")
     print("##############\n\n")
     return None
-
-
-def is_subscribed(user_id):
-    try:
-        chat_member = bot.get_chat_member(CHANNEL_USERNAME, user_id)
-        return chat_member.status in ["member", "administrator", "creator"]
-    except Exception as e:
-        print(f"Ошибка при проверке подписки: {e}")
-        return False  # Если ошибка, считаем, что не подписан
 
 
 # Функция для установки команд меню
@@ -150,28 +140,6 @@ def get_currency_rates():
 # Обработчик команды /cbr
 @bot.message_handler(commands=["cbr"])
 def cbr_command(message):
-    user_id = message.from_user.id
-
-    if not is_subscribed(user_id):
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(
-            types.InlineKeyboardButton(
-                "🔗 Подписаться", url=f"https://t.me/{CHANNEL_USERNAME.lstrip('@')}"
-            )
-        )
-        keyboard.add(
-            types.InlineKeyboardButton(
-                "🔄 Проверить подписку", callback_data="check_subscription"
-            )
-        )
-
-        bot.send_message(
-            message.chat.id,
-            f"🚫 Доступ ограничен! Подпишитесь на наш канал {CHANNEL_USERNAME}, чтобы пользоваться ботом.",
-            reply_markup=keyboard,
-        )
-        return  # Прерываем выполнение, если не подписан
-
     try:
         rates_text = get_currency_rates()
 
@@ -201,7 +169,7 @@ def main_menu():
     keyboard.add(
         types.KeyboardButton("Написать менеджеру"),
         types.KeyboardButton("О нас"),
-        types.KeyboardButton("Telegram-канал"),
+        # types.KeyboardButton("Telegram-канал"),
         types.KeyboardButton("Написать в WhatsApp"),
         types.KeyboardButton("Instagram"),
         types.KeyboardButton("Tik-Tok"),
@@ -210,68 +178,19 @@ def main_menu():
     return keyboard
 
 
-@bot.callback_query_handler(func=lambda call: call.data == "check_subscription")
-def check_subscription(call):
-    user_id = call.from_user.id
-
-    if is_subscribed(user_id):
-        bot.answer_callback_query(call.id, "✅ Вы подписаны!")
-        bot.send_message(
-            call.message.chat.id,
-            "✅ Спасибо за подписку! Теперь вы можете пользоваться ботом.",
-            reply_markup=main_menu(),
-        )
-    else:
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(
-            types.InlineKeyboardButton(
-                "🔗 Подписаться", url=f"https://t.me/{CHANNEL_USERNAME.lstrip('@')}"
-            )
-        )
-        keyboard.add(
-            types.InlineKeyboardButton(
-                "🔄 Проверить подписку", callback_data="check_subscription"
-            )
-        )
-
-        bot.send_message(
-            call.message.chat.id,
-            "🚫 Вы ещё не подписались! Подпишитесь и нажмите кнопку 🔄 Проверить подписку.",
-            reply_markup=keyboard,
-        )
-
-
 # Start command handler
 @bot.message_handler(commands=["start"])
 def send_welcome(message):
-    user_id = message.from_user.id
-
-    if not is_subscribed(user_id):
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(
-            types.InlineKeyboardButton(
-                "🔗 Подписаться", url=f"https://t.me/{CHANNEL_USERNAME.lstrip('@')}"
-            )
-        )
-        keyboard.add(
-            types.InlineKeyboardButton(
-                "🔄 Проверить подписку", callback_data="check_subscription"
-            )
-        )
-
-        bot.send_message(
-            message.chat.id,
-            f"🚫 Доступ ограничен! Подпишитесь на наш канал {CHANNEL_USERNAME}, чтобы пользоваться ботом.",
-            reply_markup=keyboard,
-        )
-        return  # Прерываем выполнение, если не подписан
-
     get_currency_rates()
+
+    # Отправляем логотип компании
+    with open("logo.jpg", "rb") as logo:
+        bot.send_photo(message.chat.id, logo)
 
     user_first_name = message.from_user.first_name
     welcome_message = (
         f"Здравствуйте, {user_first_name}!\n\n"
-        "Я бот компании Bazarish Auto. Я помогу вам рассчитать стоимость понравившегося вам автомобиля из Южной Кореи до Владивостока.\n\n"
+        "Я бот компании KPP Motors. Я помогу вам рассчитать стоимость понравившегося вам автомобиля из Южной Кореи до Владивостока.\n\n"
         "Выберите действие из меню ниже."
     )
     bot.send_message(message.chat.id, welcome_message, reply_markup=main_menu())
@@ -421,7 +340,7 @@ def calculate_cost(link, message):
         keyboard = types.InlineKeyboardMarkup()
         keyboard.add(
             types.InlineKeyboardButton(
-                "Написать менеджеру", url="https://t.me@BAZARISH_KPP"
+                "Написать менеджеру", url="https://t.me/KPP_vibe"
             )
         )
         keyboard.add(
@@ -647,8 +566,8 @@ def calculate_cost(link, message):
             f"Стоимость автомобиля в Корее: ₩{format_number(price_krw)}\n"
             f"Стоимость автомобиля под ключ до Владивостока: \n<b>${format_number(total_cost_usd)} </b> | <b>₩{format_number(total_cost_krw)} </b> | <b>{format_number(total_cost)} ₽</b>\n\n"
             f"🔗 <a href='{preview_link}'>Ссылка на автомобиль</a>\n\n"
-            "Если данное авто попадает под санкции, пожалуйста уточните возможность отправки в вашу страну у менеджера @BAZARISH_KPP\n\n"
-            "🔗 <a href='https://t.me/bazarish_auto'>Официальный телеграм канал</a>\n"
+            "Если данное авто попадает под санкции, пожалуйста уточните возможность отправки в вашу страну у менеджера @KPP_vibe\n\n"
+            # "🔗 <a href='https://t.me/bazarish_auto'>Официальный телеграм канал</a>\n"
         )
 
         # Клавиатура с дальнейшими действиями
@@ -664,7 +583,7 @@ def calculate_cost(link, message):
         )
         keyboard.add(
             types.InlineKeyboardButton(
-                "Написать менеджеру", url="https://t.me/BAZARISH_KPP"
+                "Написать менеджеру", url="https://t.me/KPP_vibe"
             )
         )
         keyboard.add(
@@ -784,7 +703,7 @@ def handle_callback_query(call):
             f"Временная регистрация-Владивосток:\n<b>${format_number(car_data['perm_registration_russia_usd'])}</b> | <b>₩{format_number(car_data['perm_registration_russia_krw'])}</b> | <b>{format_number(car_data['perm_registration_russia_rub'])} ₽</b>\n\n"
             f"Итого расходов по России: \n<b>${format_number(car_data['russia_total_usd'])}</b> | <b>₩{format_number(car_data['russia_total_krw'])}</b> | <b>{format_number(car_data['russia_total_rub'])} ₽</b>\n\n\n"
             f"Итого под ключ во Владивостоке: \n<b>${format_number(car_data['total_cost_usd'])}</b> | <b>₩{format_number(car_data['total_cost_krw'])}</b> | <b>{format_number(car_data['total_cost_rub'])} ₽</b>\n\n"
-            f"<b>Доставку до вашего города уточняйте у менеджера @BAZARISH_KPP</b>\n"
+            f"<b>Доставку до вашего города уточняйте у менеджера @KPP_vibe</b>\n"
         )
 
         # Inline buttons for further actions
@@ -807,7 +726,7 @@ def handle_callback_query(call):
 
         keyboard.add(
             types.InlineKeyboardButton(
-                "Связаться с менеджером", url="https://t.me/BAZARISH_KPP"
+                "Связаться с менеджером", url="https://t.me/KPP_vibe"
             )
         )
 
@@ -851,7 +770,7 @@ def handle_callback_query(call):
             )
             keyboard.add(
                 types.InlineKeyboardButton(
-                    "Связаться с менеджером", url="https://t.me/BAZARISH_KPP"
+                    "Связаться с менеджером", url="https://t.me/KPP_vibe"
                 )
             )
 
@@ -887,7 +806,7 @@ def handle_callback_query(call):
             )
             keyboard.add(
                 types.InlineKeyboardButton(
-                    "Связаться с менеджером", url="https://t.me/BAZARISH_KPP"
+                    "Связаться с менеджером", url="https://t.me/KPP_vibe"
                 )
             )
 
@@ -923,7 +842,7 @@ def handle_message(message):
     # Проверка на другие команды
     elif user_message == "Написать менеджеру":
         bot.send_message(
-            message.chat.id, "Вы можете связаться с менеджером по ссылке: @BAZARISH_KPP"
+            message.chat.id, "Вы можете связаться с менеджером по ссылке: @KPP_vibe"
         )
     elif user_message == "Написать в WhatsApp":
         contacts = [
@@ -941,7 +860,7 @@ def handle_message(message):
         bot.send_message(message.chat.id, message_text, parse_mode="Markdown")
 
     elif user_message == "О нас":
-        about_message = "Bazarish Auto\nЮжнокорейская экспортная компания.\nСпециализируемся на поставках автомобилей из Южной Кореи в страны СНГ.\nОпыт работы более 5 лет.\n\nПочему выбирают нас?\n• Надежность и скорость доставки.\n• Индивидуальный подход к каждому клиенту.\n• Полное сопровождение сделки.\n\n💬 Ваш путь к надежным автомобилям начинается здесь!"
+        about_message = "KPP Motors\nЮжнокорейская экспортная компания.\nСпециализируемся на поставках автомобилей из Южной Кореи в страны СНГ.\nОпыт работы более 5 лет.\n\nПочему выбирают нас?\n• Надежность и скорость доставки.\n• Индивидуальный подход к каждому клиенту.\n• Полное сопровождение сделки.\n\n💬 Ваш путь к надежным автомобилям начинается здесь!"
         bot.send_message(message.chat.id, about_message)
     elif user_message == "Telegram-канал":
         channel_link = "https://t.me/bazarish_auto"
@@ -955,7 +874,7 @@ def handle_message(message):
             f"Посетите наш Instagram: {instagram_link}",
         )
     elif user_message == "Tik-Tok":
-        tiktok_link = "https://www.tiktok.com/@kpp_motors"
+        tiktok_link = "https://www.tiktok.com/@bazarish_auto"
         bot.send_message(
             message.chat.id,
             f"Следите за свежим контентом на нашем TikTok: {tiktok_link}",
