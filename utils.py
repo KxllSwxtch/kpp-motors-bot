@@ -1,9 +1,67 @@
 import requests
 import datetime
 import locale
+import json
+import os
 
 PROXY_URL = "http://B01vby:GBno0x@45.118.250.2:8000"
 proxies = {"http": PROXY_URL, "https": PROXY_URL}
+
+HP_CACHE_FILE = "hp_cache.json"
+
+
+def get_pan_auto_data(car_id):
+    """
+    Fetches car data from pan-auto.ru API.
+    Returns dict with customs values and HP if available, or None if not found.
+    """
+    url = f"https://zefir.pan-auto.ru/api/cars/{car_id}/"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+        "Origin": "https://pan-auto.ru",
+        "Referer": "https://pan-auto.ru/",
+        "Accept": "*/*",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+    }
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        if response.status_code == 200:
+            return response.json()
+        return None
+    except requests.RequestException as e:
+        print(f"Ошибка при запросе к pan-auto.ru: {e}")
+        return None
+
+
+def load_hp_cache():
+    """Load HP cache from JSON file"""
+    if os.path.exists(HP_CACHE_FILE):
+        try:
+            with open(HP_CACHE_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            return {}
+    return {}
+
+
+def save_hp_to_cache(make, model, engine_volume, hp):
+    """Save HP value to cache file"""
+    cache = load_hp_cache()
+    key = f"{make}_{model}_{engine_volume}"
+    cache[key] = hp
+    try:
+        with open(HP_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(cache, f, indent=2, ensure_ascii=False)
+    except IOError as e:
+        print(f"Ошибка при сохранении HP в кэш: {e}")
+
+
+def get_hp_from_cache(make, model, engine_volume):
+    """Get HP from cache if exists"""
+    cache = load_hp_cache()
+    key = f"{make}_{model}_{engine_volume}"
+    return cache.get(key)
 
 
 def format_number(number):
@@ -38,13 +96,14 @@ def calculate_age(year, month):
         return "7-0"
 
 
-def get_customs_fees(engine_volume, car_price, car_year, car_month, engine_type=1):
+def get_customs_fees(engine_volume, car_price, car_year, car_month, engine_type=1, power=1):
     """
     Запрашивает расчёт таможенных платежей с сайта calcus.ru.
     :param engine_volume: Объём двигателя (куб. см)
     :param car_price: Цена авто в вонах
     :param car_year: Год выпуска авто
     :param engine_type: Тип двигателя (1 - бензин, 2 - дизель, 3 - гибрид, 4 - электромобиль)
+    :param power: Мощность двигателя в л.с. (для расчёта утилизационного сбора)
     :return: JSON с результатами расчёта
     """
     url = "https://calcus.ru/calculate/Customs"
@@ -53,7 +112,7 @@ def get_customs_fees(engine_volume, car_price, car_year, car_month, engine_type=
         "owner": 1,  # Физлицо
         "age": calculate_age(car_year, car_month),  # Возрастная категория
         "engine": engine_type,  # Тип двигателя (по умолчанию 1 - бензин)
-        "power": 1,  # Лошадиные силы (можно оставить 1)
+        "power": int(power),  # Лошадиные силы (для расчёта утилизационного сбора)
         "power_unit": 1,  # Тип мощности (1 - л.с.)
         "value": int(engine_volume),  # Объём двигателя
         "price": int(car_price),  # Цена авто в KRW
