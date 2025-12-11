@@ -175,11 +175,24 @@ def main_menu():
     keyboard.add(
         types.KeyboardButton("Написать менеджеру"),
         types.KeyboardButton("О нас"),
-        # types.KeyboardButton("Telegram-канал"),
         types.KeyboardButton("Написать в WhatsApp"),
-        types.KeyboardButton("Instagram"),
-        types.KeyboardButton("Tik-Tok"),
+    )
+    keyboard.add(
+        types.KeyboardButton("Instagram Export"),
+        types.KeyboardButton("Instagram Garage"),
+    )
+    keyboard.add(
+        types.KeyboardButton("TikTok Garage"),
+        types.KeyboardButton("TikTok Auto"),
+        types.KeyboardButton("TikTok Motors"),
+    )
+    keyboard.add(
+        types.KeyboardButton("Telegram-канал"),
+        types.KeyboardButton("Telegram Bot"),
+    )
+    keyboard.add(
         types.KeyboardButton("Facebook"),
+        types.KeyboardButton("Сайт"),
     )
     return keyboard
 
@@ -1082,27 +1095,56 @@ def handle_message(message):
         about_message = "KPP Motors\nЮжнокорейская экспортная компания.\nСпециализируемся на поставках автомобилей из Южной Кореи в страны СНГ.\nОпыт работы более 5 лет.\n\nПочему выбирают нас?\n• Надежность и скорость доставки.\n• Индивидуальный подход к каждому клиенту.\n• Полное сопровождение сделки.\n\n💬 Ваш путь к надежным автомобилям начинается здесь!"
         bot.send_message(message.chat.id, about_message)
     elif user_message == "Telegram-канал":
-        channel_link = "https://t.me/bazarish_auto"
+        channel_link = "https://t.me/kpp_auto_export"
         bot.send_message(
             message.chat.id, f"Подписывайтесь на наш Telegram-канал: {channel_link}"
         )
-    elif user_message == "Instagram":
-        instagram_link = "https://www.instagram.com/bazarish_auto/"
+    elif user_message == "Telegram Bot":
+        bot_link = "https://t.me/kppmotorskoreabot"
+        bot.send_message(
+            message.chat.id, f"Наш Telegram-бот: {bot_link}"
+        )
+    elif user_message == "Instagram Export":
+        instagram_link = "https://www.instagram.com/kpp_auto_export"
         bot.send_message(
             message.chat.id,
             f"Посетите наш Instagram: {instagram_link}",
         )
-    elif user_message == "Tik-Tok":
-        tiktok_link = "https://www.tiktok.com/@bazarish_auto"
+    elif user_message == "Instagram Garage":
+        instagram_link = "https://www.instagram.com/kpp_auto_garage"
+        bot.send_message(
+            message.chat.id,
+            f"Посетите наш Instagram: {instagram_link}",
+        )
+    elif user_message == "TikTok Garage":
+        tiktok_link = "https://www.tiktok.com/@kpp.auto.garage"
+        bot.send_message(
+            message.chat.id,
+            f"Следите за свежим контентом на нашем TikTok: {tiktok_link}",
+        )
+    elif user_message == "TikTok Auto":
+        tiktok_link = "https://www.tiktok.com/@kppauto"
+        bot.send_message(
+            message.chat.id,
+            f"Следите за свежим контентом на нашем TikTok: {tiktok_link}",
+        )
+    elif user_message == "TikTok Motors":
+        tiktok_link = "https://www.tiktok.com/@kpp_motors.kr"
         bot.send_message(
             message.chat.id,
             f"Следите за свежим контентом на нашем TikTok: {tiktok_link}",
         )
     elif user_message == "Facebook":
-        facebook_link = "https://www.facebook.com/share/1D8bg2xL1i/?mibextid=wwXIfr"
+        facebook_link = "https://www.facebook.com/profile.php?id=61563015736179&mibextid=wwXIfr&rdid=HUwnjqhvHBlkenIE&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1AKzMLM8AN%2F%3Fmibextid%3DwwXIfr#"
         bot.send_message(
             message.chat.id,
             f"KPP Motors на Facebook: {facebook_link}",
+        )
+    elif user_message == "Сайт":
+        website_link = "https://kppkr.com/"
+        bot.send_message(
+            message.chat.id,
+            f"Наш сайт: {website_link}",
         )
     else:
         bot.send_message(
