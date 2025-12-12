@@ -672,19 +672,29 @@ def calculate_cost(link, message):
         customs_duty = None
         recycling_fee = None
 
-        if pan_auto_data and pan_auto_data.get("hp") and pan_auto_data.get("costs"):
-            # Используем данные с pan-auto.ru
-            print_message(f"Найдены данные на pan-auto.ru, HP: {pan_auto_data.get('hp')}")
+        if pan_auto_data and pan_auto_data.get("hp"):
+            # Используем HP с pan-auto.ru для расчёта через calcus.ru
+            hp = pan_auto_data.get("hp")
+            print_message(f"Найден HP на pan-auto.ru: {hp}")
             try:
-                costs_rub = pan_auto_data["costs"]["RUB"]
-                customs_fee = int(costs_rub.get("clearanceCost", 0))
-                customs_duty = int(costs_rub.get("customsDuty", 0))
-                recycling_fee = int(costs_rub.get("utilizationFee", 0))
-
                 # Сохраняем HP в кэш для будущего использования
-                save_hp_to_cache(car_make, car_model, car_engine_displacement_int, pan_auto_data["hp"])
+                save_hp_to_cache(car_make, car_model, car_engine_displacement_int, hp)
+
+                # Рассчитываем таможенные сборы через calcus.ru
+                response = get_customs_fees(
+                    car_engine_displacement_int,
+                    price_krw,
+                    int(f"20{year}"),
+                    month,
+                    engine_type=1,
+                    power=hp,
+                )
+                if response:
+                    customs_fee = clean_number(response["sbor"])
+                    customs_duty = clean_number(response["tax"])
+                    recycling_fee = clean_number(response["util"])
             except (KeyError, TypeError) as e:
-                print(f"Ошибка при разборе данных pan-auto.ru: {e}")
+                print(f"Ошибка при расчёте таможни с HP от pan-auto.ru: {e}")
                 customs_fee = None
 
         # Если pan-auto.ru не дал результата, проверяем кэш HP
